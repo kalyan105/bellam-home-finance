@@ -1,0 +1,49 @@
+name: Bellam Home Finance CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Generate Prisma Client (if Prisma exists)
+      - name: Generate Prisma Client
+        run: |
+          if [ -f prisma/schema.prisma ]; then
+            npx prisma generate
+          fi
+
+      # Step 5: Build application
+      - name: Build application
+        run: npm run build
+
+      # Step 6: Run tests (optional)
+      - name: Run tests
+        run: |
+          if npm run | grep -q test; then
+            npm test
+          else
+            echo "No tests configured"
+          fi
