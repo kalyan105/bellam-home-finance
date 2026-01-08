@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bellam Finance Manager - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🏠 Bellam Family Finance</h1>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Month/Year Selector -->
+            <div class="card date-selector">
+                <div class="date-controls">
+                    <div class="form-group-inline">
+                        <label for="monthSelect">Month:</label>
+                        <select id="monthSelect">
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                    <div class="form-group-inline">
+                        <label for="yearSelect">Year:</label>
+                        <select id="yearSelect"></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="summary-grid">
+                <div class="card summary-card total">
+                    <h3>Total Salary</h3>
+                    <p class="amount" id="totalSalary">₹0</p>
+                </div>
+                <div class="card summary-card spent">
+                    <h3>Total Spent</h3>
+                    <p class="amount" id="totalSpent">₹0</p>
+                </div>
+                <div class="card summary-card remaining">
+                    <h3>Remaining</h3>
+                    <p class="amount" id="remaining">₹0</p>
+                </div>
+                <div class="card summary-card savings">
+                    <h3>Savings</h3>
+                    <p class="amount" id="savings">₹0</p>
+                    <p class="grade" id="grade"></p>
+                </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="card instructions-card" id="instructionsCard" style="display: none;">
+                <h3>💡 Financial Advice</h3>
+                <p id="instructions"></p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="family">👨‍👩‍👧‍👦 Family Members</button>
+                <button class="tab-btn" data-tab="emis">🏦 EMIs</button>
+                <button class="tab-btn" data-tab="daily">🛒 Daily Expenses</button>
+            </div>
+
+            <!-- Family Members Section -->
+            <div class="tab-content active" id="family-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Family Members & Salaries</h2>
+                        <button class="btn btn-primary" id="addFamilyBtn">+ Add Member</button>
+                    </div>
+                    
+                    <!-- Add Family Member Form -->
+                    <div id="familyForm" class="form-container" style="display: none;">
+                        <div class="form-group">
+                            <label for="familyName">Member Name</label>
+                            <input type="text" id="familyName" placeholder="Enter name">
+                        </div>
+                        <div class="form-group">
+                            <label for="familySalary">Monthly Salary (₹)</label>
+                            <input type="number" id="familySalary" placeholder="Enter salary">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="saveFamilyBtn">Save</button>
+                            <button class="btn btn-secondary" id="cancelFamilyBtn">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Family Members List -->
+                    <div class="list-container" id="familyList"></div>
+                </div>
+            </div>
+
+            <!-- EMIs Section -->
+            <div class="tab-content" id="emis-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>EMIs (Equated Monthly Installments)</h2>
+                        <button class="btn btn-primary" id="addEmiBtn">+ Add EMI</button>
+                    </div>
+                    
+                    <!-- Add EMI Form -->
+                    <div id="emiForm" class="form-container" style="display: none;">
+                        <div class="form-group">
+                            <label for="emiItemName">Item Name</label>
+                            <input type="text" id="emiItemName" placeholder="E.g., Home Loan, Car Loan">
+                        </div>
+                        <div class="form-group">
+                            <label for="emiAmount">EMI Amount (₹)</label>
+                            <input type="number" id="emiAmount" placeholder="Enter EMI amount">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="saveEmiBtn">Save</button>
+                            <button class="btn btn-secondary" id="cancelEmiBtn">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- EMIs List -->
+                    <div class="list-container" id="emiList"></div>
+                </div>
+            </div>
+
+            <!-- Daily Expenses Section -->
+            <div class="tab-content" id="daily-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Daily Expenses</h2>
+                        <button class="btn btn-primary" id="addExpenseBtn">+ Add Expense</button>
+                    </div>
+                    
+                    <!-- Add Expense Form -->
+                    <div id="expenseForm" class="form-container" style="display: none;">
+                        <div class="form-group">
+                            <label for="expenseProduct">Product Name</label>
+                            <input type="text" id="expenseProduct" placeholder="E.g., Groceries, Vegetables">
+                        </div>
+                        <div class="form-group">
+                            <label for="expensePrice">Price (₹)</label>
+                            <input type="number" id="expensePrice" placeholder="Enter price">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="saveExpenseBtn">Save</button>
+                            <button class="btn btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Expenses List -->
+                    <div class="list-container" id="expenseList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

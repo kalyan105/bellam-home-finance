@@ -1,0 +1,67 @@
+{
+  "familyMembers": [
+    {
+      "id": 1767884015756,
+      "name": "KALYAN",
+      "salary": 20000,
+      "createdAt": "2026-01-08T14:53:35.756Z"
+    },
+    {
+      "id": 1767884041253,
+      "name": "KEERTHI",
+      "salary": 47500,
+      "createdAt": "2026-01-08T14:54:01.254Z"
+    }
+  ],
+  "emis": [
+    {
+      "id": 1767884245036,
+      "itemName": "HOME",
+      "amount": 15500,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T14:57:25.036Z"
+    },
+    {
+      "id": 1767884366194,
+      "itemName": "WATER PURIFIER",
+      "amount": 2475,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T14:59:26.194Z"
+    },
+    {
+      "id": 1767884412081,
+      "itemName": "REFRIGERATOR",
+      "amount": 1600,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T15:00:12.081Z"
+    },
+    {
+      "id": 1767884457969,
+      "itemName": "CD-BIRLA HEALTH",
+      "amount": 236,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T15:00:57.969Z"
+    },
+    {
+      "id": 1767884489857,
+      "itemName": "WASHING MACHINE",
+      "amount": 2750,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T15:01:29.857Z"
+    },
+    {
+      "id": 1767884528753,
+      "itemName": "ROOM RENT",
+      "amount": 21200,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-08T15:02:08.753Z"
+    }
+  ],
+  "dailyExpenses": []
+}
