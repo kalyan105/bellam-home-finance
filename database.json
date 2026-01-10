@@ -3,12 +3,14 @@
     {
       "id": 1768053824791,
       "username": "kalyan",
+      "mobile": "9390872913",
       "password": "$2b$10$8oAJZ.FQKWC346vgQWB8zu5d7TGsbFhI6BgHfTl2c8CdzjQaEP3yS",
       "createdAt": "2026-01-10T14:03:44.791Z"
     },
     {
       "id": 1768056964027,
       "username": "keerthi",
+      "mobile": "9949199752",
       "password": "$2b$10$kayQOUh5cDHo9vSrxR3i2OMWyPpx9GV3JHA1ujgXaYpYfB53vfWly",
       "createdAt": "2026-01-10T14:56:04.027Z"
     }

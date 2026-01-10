@@ -23,8 +23,8 @@
             <!-- Login Form -->
             <form id="loginForm" class="auth-form active">
                 <div class="form-group">
-                    <label for="loginUsername">Username</label>
-                    <input type="text" id="loginUsername" name="username" required autocomplete="username">
+                    <label for="loginMobile">Mobile Number</label>
+                    <input type="tel" id="loginMobile" name="mobile" required autocomplete="tel" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}">
                 </div>
                 
                 <div class="form-group">
@@ -45,9 +45,15 @@
             <!-- Registration Form -->
             <form id="registerForm" class="auth-form">
                 <div class="form-group">
-                    <label for="registerUsername">Username</label>
-                    <input type="text" id="registerUsername" name="username" required autocomplete="off" minlength="3">
+                    <label for="registerUsername">Name</label>
+                    <input type="text" id="registerUsername" name="username" required autocomplete="off" minlength="3" placeholder="Your name">
                     <small>At least 3 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="registerMobile">Mobile Number</label>
+                    <input type="tel" id="registerMobile" name="mobile" required autocomplete="tel" placeholder="10-digit mobile number" maxlength="10" pattern="[0-9]{10}">
+                    <small>Enter your 10-digit mobile number (unique ID)</small>
                 </div>
                 
                 <div class="form-group">
@@ -142,9 +148,16 @@
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const username = document.getElementById('loginUsername').value;
+            const mobile = document.getElementById('loginMobile').value;
             const password = document.getElementById('loginPassword').value;
             const errorMessage = document.getElementById('loginError');
+            
+            // Validate mobile number
+            if (!/^[0-9]{10}$/.test(mobile)) {
+                errorMessage.textContent = 'Please enter a valid 10-digit mobile number';
+                errorMessage.style.display = 'block';
+                return;
+            }
             
             try {
                 const response = await fetch('/api/login', {
@@ -152,7 +165,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ mobile, password })
                 });
                 
                 const data = await response.json();
@@ -160,7 +173,7 @@
                 if (response.ok) {
                     window.location.href = '/dashboard.html';
                 } else {
-                    errorMessage.textContent = data.error || 'Invalid username or password';
+                    errorMessage.textContent = data.error || 'Invalid mobile number or password';
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
@@ -174,6 +187,7 @@
             e.preventDefault();
             
             const username = document.getElementById('registerUsername').value;
+            const mobile = document.getElementById('registerMobile').value;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const errorMessage = document.getElementById('registerError');
@@ -182,6 +196,13 @@
             // Clear previous messages
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
+            
+            // Validate mobile number
+            if (!/^[0-9]{10}$/.test(mobile)) {
+                errorMessage.textContent = 'Please enter a valid 10-digit mobile number';
+                errorMessage.style.display = 'block';
+                return;
+            }
             
             // Validate password confirmation
             if (password !== confirmPassword) {
@@ -196,13 +217,13 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, mobile, password })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    successMessage.textContent = 'Registration successful! Please sign in.';
+                    successMessage.textContent = 'Registration successful! Please sign in with your mobile number.';
                     successMessage.style.display = 'block';
                     registerForm.reset();
                     

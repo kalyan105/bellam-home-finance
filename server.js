@@ -55,10 +55,10 @@ function isAuthenticated(req, res, next) {
 
 // Registration endpoint
 app.post('/api/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, mobile } = req.body;
     
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    if (!username || !password || !mobile) {
+        return res.status(400).json({ error: 'Username, password, and mobile number are required' });
     }
     
     if (username.length < 3) {
@@ -69,12 +69,18 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
     
+    // Validate mobile number (10 digits)
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobile)) {
+        return res.status(400).json({ error: 'Mobile number must be exactly 10 digits' });
+    }
+    
     const data = readDatabase();
     
-    // Check if username already exists
-    const existingUser = data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (existingUser) {
-        return res.status(400).json({ error: 'Username already exists' });
+    // Check if mobile number already exists
+    const existingMobile = data.users.find(u => u.mobile === mobile);
+    if (existingMobile) {
+        return res.status(400).json({ error: 'This mobile number is already registered' });
     }
     
     try {
@@ -85,6 +91,7 @@ app.post('/api/register', async (req, res) => {
         const newUser = {
             id: Date.now(),
             username: username,
+            mobile: mobile,
             password: hashedPassword,
             createdAt: new Date().toISOString()
         };
@@ -101,17 +108,17 @@ app.post('/api/register', async (req, res) => {
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { mobile, password } = req.body;
     
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
+    if (!mobile || !password) {
+        return res.status(400).json({ error: 'Mobile number and password are required' });
     }
     
     const data = readDatabase();
-    const user = data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    const user = data.users.find(u => u.mobile === mobile);
     
     if (!user) {
-        return res.status(401).json({ error: 'Invalid username or password' });
+        return res.status(401).json({ error: 'Invalid mobile number or password' });
     }
     
     try {
@@ -121,9 +128,10 @@ app.post('/api/login', async (req, res) => {
         if (passwordMatch) {
             req.session.userId = user.id;
             req.session.username = user.username;
+            req.session.mobile = user.mobile;
             res.json({ success: true });
         } else {
-            res.status(401).json({ error: 'Invalid username or password' });
+            res.status(401).json({ error: 'Invalid mobile number or password' });
         }
     } catch (error) {
         console.error('Login error:', error);
