@@ -8,6 +8,7 @@ let editingType = null;
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     initializeYearSelector();
+    initializeEMIYearFields();
     initializeMonthSelector();
     setupEventListeners();
     loadData();
@@ -41,6 +42,13 @@ function initializeYearSelector() {
         }
         yearSelect.appendChild(option);
     }
+}
+
+// Initialize EMI year fields
+function initializeEMIYearFields() {
+    const currentYear = new Date().getFullYear();
+    document.getElementById('emiStartYear').value = currentYear;
+    document.getElementById('emiEndYear').value = currentYear + 1;
 }
 
 // Initialize month selector
@@ -93,12 +101,28 @@ function setupEventListeners() {
 }
 
 // Logout
+// Logout
 async function logout() {
     try {
-        await fetch('/api/logout', { method: 'POST' });
-        window.location.href = '/index.html';
+        const response = await fetch('/api/logout', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+            // Clear any local storage if needed
+            sessionStorage.clear();
+            localStorage.clear();
+            
+            // Redirect to login page
+            window.location.href = '/index.html';
+        } else {
+            console.error('Logout failed with status:', response.status);
+            alert('Logout failed. Please try again.');
+        }
     } catch (error) {
         console.error('Logout failed:', error);
+        alert('Logout failed. Please try again.');
     }
 }
 
@@ -143,6 +167,12 @@ function showForm(type) {
         document.getElementById('emiForm').style.display = 'block';
         document.getElementById('emiItemName').value = '';
         document.getElementById('emiAmount').value = '';
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+        document.getElementById('emiStartMonth').value = currentMonth;
+        document.getElementById('emiStartYear').value = currentYear;
+        document.getElementById('emiEndMonth').value = currentMonth;
+        document.getElementById('emiEndYear').value = currentYear + 1;
     } else if (type === 'expense') {
         document.getElementById('expenseForm').style.display = 'block';
         document.getElementById('expenseProduct').value = '';
@@ -195,9 +225,18 @@ async function saveFamilyMember() {
 async function saveEmi() {
     const itemName = document.getElementById('emiItemName').value.trim();
     const amount = parseFloat(document.getElementById('emiAmount').value);
+    const startMonth = document.getElementById('emiStartMonth').value;
+    const startYear = parseInt(document.getElementById('emiStartYear').value);
+    const endMonth = document.getElementById('emiEndMonth').value;
+    const endYear = parseInt(document.getElementById('emiEndYear').value);
     
     if (!itemName || !amount || amount <= 0) {
         alert('Please enter valid item name and amount');
+        return;
+    }
+    
+    if (!startMonth || !startYear || !endMonth || !endYear) {
+        alert('Please enter valid start and end dates');
         return;
     }
     
@@ -212,7 +251,11 @@ async function saveEmi() {
                 itemName, 
                 amount, 
                 month: currentMonth, 
-                year: currentYear 
+                year: currentYear,
+                startMonth,
+                startYear,
+                endMonth,
+                endYear
             })
         });
         
@@ -275,6 +318,10 @@ function editEmi(emi) {
     document.getElementById('emiForm').style.display = 'block';
     document.getElementById('emiItemName').value = emi.itemName;
     document.getElementById('emiAmount').value = emi.amount;
+    document.getElementById('emiStartMonth').value = emi.startMonth || 'January';
+    document.getElementById('emiStartYear').value = emi.startYear || new Date().getFullYear();
+    document.getElementById('emiEndMonth').value = emi.endMonth || 'December';
+    document.getElementById('emiEndYear').value = emi.endYear || new Date().getFullYear();
 }
 
 // Edit expense
@@ -359,11 +406,16 @@ function renderEmis(emis) {
         return;
     }
     
-    container.innerHTML = filtered.map(emi => `
+    container.innerHTML = filtered.map(emi => {
+        const dateRange = emi.startMonth && emi.startYear && emi.endMonth && emi.endYear
+            ? `${emi.startMonth} ${emi.startYear} - ${emi.endMonth} ${emi.endYear}`
+            : `${emi.month} ${emi.year}`;
+        
+        return `
         <div class="list-item">
             <div class="list-item-content">
                 <div class="list-item-title">${emi.itemName}</div>
-                <div class="list-item-detail">${emi.month} ${emi.year}</div>
+                <div class="list-item-detail">📅 ${dateRange}</div>
             </div>
             <div class="list-item-amount">₹${emi.amount.toLocaleString('en-IN')}</div>
             <div class="list-item-actions">
@@ -371,7 +423,8 @@ function renderEmis(emis) {
                 <button class="btn btn-danger btn-small" onclick="deleteEmi(${emi.id})">Delete</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Render daily expenses

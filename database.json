@@ -1,13 +1,29 @@
 {
+  "users": [
+    {
+      "id": 1768053824791,
+      "username": "kalyan",
+      "password": "$2b$10$8oAJZ.FQKWC346vgQWB8zu5d7TGsbFhI6BgHfTl2c8CdzjQaEP3yS",
+      "createdAt": "2026-01-10T14:03:44.791Z"
+    },
+    {
+      "id": 1768056964027,
+      "username": "keerthi",
+      "password": "$2b$10$kayQOUh5cDHo9vSrxR3i2OMWyPpx9GV3JHA1ujgXaYpYfB53vfWly",
+      "createdAt": "2026-01-10T14:56:04.027Z"
+    }
+  ],
   "familyMembers": [
     {
       "id": 1767884015756,
+      "userId": 1768053824791,
       "name": "KALYAN",
       "salary": 20000,
       "createdAt": "2026-01-08T14:53:35.756Z"
     },
     {
       "id": 1767884041253,
+      "userId": 1768053824791,
       "name": "KEERTHI",
       "salary": 47500,
       "createdAt": "2026-01-08T14:54:01.254Z"
@@ -16,52 +32,92 @@
   "emis": [
     {
       "id": 1767884245036,
+      "userId": 1768053824791,
       "itemName": "HOME",
       "amount": 15500,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2045,
       "createdAt": "2026-01-08T14:57:25.036Z"
     },
     {
       "id": 1767884366194,
+      "userId": 1768053824791,
       "itemName": "WATER PURIFIER",
       "amount": 2475,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2027,
       "createdAt": "2026-01-08T14:59:26.194Z"
     },
     {
       "id": 1767884412081,
+      "userId": 1768053824791,
       "itemName": "REFRIGERATOR",
       "amount": 1600,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2027,
       "createdAt": "2026-01-08T15:00:12.081Z"
     },
     {
       "id": 1767884457969,
+      "userId": 1768053824791,
       "itemName": "CD-BIRLA HEALTH",
       "amount": 236,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2026,
       "createdAt": "2026-01-08T15:00:57.969Z"
     },
     {
       "id": 1767884489857,
+      "userId": 1768053824791,
       "itemName": "WASHING MACHINE",
       "amount": 2750,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2027,
       "createdAt": "2026-01-08T15:01:29.857Z"
     },
     {
       "id": 1767884528753,
+      "userId": 1768053824791,
       "itemName": "ROOM RENT",
       "amount": 21200,
       "month": "January",
       "year": 2026,
+      "startMonth": "January",
+      "startYear": 2026,
+      "endMonth": "December",
+      "endYear": 2026,
       "createdAt": "2026-01-08T15:02:08.753Z"
     }
   ],
-  "dailyExpenses": []
+  "dailyExpenses": [
+    {
+      "id": 1768054050292,
+      "userId": 1768053824791,
+      "productName": "egg",
+      "price": 48,
+      "month": "January",
+      "year": 2026,
+      "createdAt": "2026-01-10T14:07:30.292Z"
+    }
+  ]
 }

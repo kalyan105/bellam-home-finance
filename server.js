@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -23,6 +24,7 @@ app.use(session({
 function initDatabase() {
     if (!fs.existsSync(DB_FILE)) {
         const initialData = {
+            users: [],
             familyMembers: [],
             emis: [],
             dailyExpenses: []
@@ -44,44 +46,124 @@ function writeDatabase(data) {
 
 // Authentication middleware
 function isAuthenticated(req, res, next) {
-    if (req.session.user) {
+    if (req.session.userId) {
         next();
     } else {
         res.status(401).json({ error: 'Unauthorized' });
     }
 }
 
-// Login endpoint
-app.post('/api/login', (req, res) => {
+// Registration endpoint
+app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
     
-    if (username === 'BELLAM' && password === 'Bellam@123') {
-        req.session.user = username;
-        res.json({ success: true });
-    } else {
-        res.status(401).json({ error: 'Invalid credentials' });
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    if (username.length < 3) {
+        return res.status(400).json({ error: 'Username must be at least 3 characters' });
+    }
+    
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    
+    const data = readDatabase();
+    
+    // Check if username already exists
+    const existingUser = data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    if (existingUser) {
+        return res.status(400).json({ error: 'Username already exists' });
+    }
+    
+    try {
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Create new user
+        const newUser = {
+            id: Date.now(),
+            username: username,
+            password: hashedPassword,
+            createdAt: new Date().toISOString()
+        };
+        
+        data.users.push(newUser);
+        writeDatabase(data);
+        
+        res.json({ success: true, message: 'Registration successful' });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Registration failed' });
+    }
+});
+
+// Login endpoint
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+    
+    const data = readDatabase();
+    const user = data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    try {
+        // Compare password
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        
+        if (passwordMatch) {
+            req.session.userId = user.id;
+            req.session.username = user.username;
+            res.json({ success: true });
+        } else {
+            res.status(401).json({ error: 'Invalid username or password' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Login failed' });
     }
 });
 
 // Logout endpoint
+// Logout endpoint
 app.post('/api/logout', (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).json({ error: 'Logout failed' });
+        }
+        res.json({ success: true });
+    });
 });
 
 // Check authentication
 app.get('/api/check-auth', (req, res) => {
-    if (req.session.user) {
-        res.json({ authenticated: true });
+    if (req.session.userId) {
+        res.json({ authenticated: true, username: req.session.username });
     } else {
         res.json({ authenticated: false });
     }
 });
 
-// Get all data
+// Get all data (filtered by user)
 app.get('/api/data', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    res.json(data);
+    const userId = req.session.userId;
+    
+    const filteredData = {
+        familyMembers: data.familyMembers.filter(m => m.userId === userId),
+        emis: data.emis.filter(e => e.userId === userId),
+        dailyExpenses: data.dailyExpenses.filter(d => d.userId === userId)
+    };
+    
+    res.json(filteredData);
 });
 
 // Family Members endpoints
@@ -89,6 +171,7 @@ app.post('/api/family-members', isAuthenticated, (req, res) => {
     const data = readDatabase();
     const newMember = {
         id: Date.now(),
+        userId: req.session.userId,
         name: req.body.name,
         salary: parseFloat(req.body.salary),
         createdAt: new Date().toISOString()
@@ -100,7 +183,8 @@ app.post('/api/family-members', isAuthenticated, (req, res) => {
 
 app.put('/api/family-members/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    const index = data.familyMembers.findIndex(m => m.id === parseInt(req.params.id));
+    const userId = req.session.userId;
+    const index = data.familyMembers.findIndex(m => m.id === parseInt(req.params.id) && m.userId === userId);
     if (index !== -1) {
         data.familyMembers[index] = {
             ...data.familyMembers[index],
@@ -116,7 +200,8 @@ app.put('/api/family-members/:id', isAuthenticated, (req, res) => {
 
 app.delete('/api/family-members/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    data.familyMembers = data.familyMembers.filter(m => m.id !== parseInt(req.params.id));
+    const userId = req.session.userId;
+    data.familyMembers = data.familyMembers.filter(m => !(m.id === parseInt(req.params.id) && m.userId === userId));
     writeDatabase(data);
     res.json({ success: true });
 });
@@ -126,10 +211,15 @@ app.post('/api/emis', isAuthenticated, (req, res) => {
     const data = readDatabase();
     const newEMI = {
         id: Date.now(),
+        userId: req.session.userId,
         itemName: req.body.itemName,
         amount: parseFloat(req.body.amount),
         month: req.body.month,
         year: parseInt(req.body.year),
+        startMonth: req.body.startMonth,
+        startYear: parseInt(req.body.startYear),
+        endMonth: req.body.endMonth,
+        endYear: parseInt(req.body.endYear),
         createdAt: new Date().toISOString()
     };
     data.emis.push(newEMI);
@@ -139,14 +229,19 @@ app.post('/api/emis', isAuthenticated, (req, res) => {
 
 app.put('/api/emis/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    const index = data.emis.findIndex(e => e.id === parseInt(req.params.id));
+    const userId = req.session.userId;
+    const index = data.emis.findIndex(e => e.id === parseInt(req.params.id) && e.userId === userId);
     if (index !== -1) {
         data.emis[index] = {
             ...data.emis[index],
             itemName: req.body.itemName,
             amount: parseFloat(req.body.amount),
             month: req.body.month,
-            year: parseInt(req.body.year)
+            year: parseInt(req.body.year),
+            startMonth: req.body.startMonth,
+            startYear: parseInt(req.body.startYear),
+            endMonth: req.body.endMonth,
+            endYear: parseInt(req.body.endYear)
         };
         writeDatabase(data);
         res.json(data.emis[index]);
@@ -157,7 +252,8 @@ app.put('/api/emis/:id', isAuthenticated, (req, res) => {
 
 app.delete('/api/emis/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    data.emis = data.emis.filter(e => e.id !== parseInt(req.params.id));
+    const userId = req.session.userId;
+    data.emis = data.emis.filter(e => !(e.id === parseInt(req.params.id) && e.userId === userId));
     writeDatabase(data);
     res.json({ success: true });
 });
@@ -167,6 +263,7 @@ app.post('/api/daily-expenses', isAuthenticated, (req, res) => {
     const data = readDatabase();
     const newExpense = {
         id: Date.now(),
+        userId: req.session.userId,
         productName: req.body.productName,
         price: parseFloat(req.body.price),
         month: req.body.month,
@@ -180,7 +277,8 @@ app.post('/api/daily-expenses', isAuthenticated, (req, res) => {
 
 app.put('/api/daily-expenses/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    const index = data.dailyExpenses.findIndex(e => e.id === parseInt(req.params.id));
+    const userId = req.session.userId;
+    const index = data.dailyExpenses.findIndex(e => e.id === parseInt(req.params.id) && e.userId === userId);
     if (index !== -1) {
         data.dailyExpenses[index] = {
             ...data.dailyExpenses[index],
@@ -198,7 +296,8 @@ app.put('/api/daily-expenses/:id', isAuthenticated, (req, res) => {
 
 app.delete('/api/daily-expenses/:id', isAuthenticated, (req, res) => {
     const data = readDatabase();
-    data.dailyExpenses = data.dailyExpenses.filter(e => e.id !== parseInt(req.params.id));
+    const userId = req.session.userId;
+    data.dailyExpenses = data.dailyExpenses.filter(e => !(e.id === parseInt(req.params.id) && e.userId === userId));
     writeDatabase(data);
     res.json({ success: true });
 });

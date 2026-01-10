@@ -4,6 +4,10 @@ A comprehensive web application for managing family finances, tracking salaries,
 
 ## ✨ Features
 
+- **Multi-User Support**: Each user can create their own account with a unique username and password
+- **Secure Authentication**: Passwords are securely hashed using bcrypt
+- **Data Isolation**: Each user sees only their own financial data
+- **User Registration**: Easy sign-up process with password confirmation
 - **Family Member Management**: Add multiple family members with their salaries
 - **EMI Tracking**: Track monthly EMIs for various items (home loans, car loans, etc.)
 - **Daily Expense Tracking**: Record daily expenses like groceries and utilities
@@ -13,14 +17,28 @@ A comprehensive web application for managing family finances, tracking salaries,
   - Receive personalized financial advice
 - **Month/Year Selection**: Filter and view data by specific months and years
 - **Data Persistence**: All data is saved in a database and persists after refresh
-- **Secure Login**: Protected access with username and password
 - **Modern UI**: Beautiful, mobile-friendly interface inspired by Kokonut design
 - **Full CRUD Operations**: Edit and delete any entry
 
-## 🔐 Login Credentials
+## 🔐 Getting Started
 
-- **Username**: `BELLAM`
-- **Password**: `BELLAM@123`
+### First Time Users
+
+1. Open the application in your browser at `http://localhost:3000`
+2. Click on the "**Sign Up**" tab
+3. Enter a username (at least 3 characters)
+4. Enter a password (at least 6 characters)
+5. Confirm your password
+6. Click "**Create Account**"
+7. After successful registration, you'll be automatically redirected to sign in
+8. Enter your credentials and click "**Sign In**"
+
+### Existing Users
+
+1. Open the application at `http://localhost:3000`
+2. Enter your username
+3. Enter your password
+4. Click "**Sign In**"
 
 ## 🚀 Installation & Setup
 
@@ -53,11 +71,24 @@ A comprehensive web application for managing family finances, tracking salaries,
 
 ## 📱 How to Use
 
-### Login
+### Creating Your Account
 1. Open the application in your browser
-2. Enter username: `BELLAM`
-3. Enter password: `BELLAM@123`
-4. Click "Sign In"
+2. Click the "**Sign Up**" tab
+3. Choose a unique username (minimum 3 characters)
+4. Create a strong password (minimum 6 characters)
+5. Re-enter your password to confirm
+6. Click "**Create Account**"
+7. Once registered, sign in with your credentials
+
+### Signing In
+1. Enter your username
+2. Enter your password
+3. Click "**Sign In**"
+
+### Important: Data Privacy
+- Each user has their own private data
+- You can only see and manage your own financial information
+- Other users cannot access your data
 
 ### Managing Family Members
 1. Click on "👨‍👩‍👧‍👦 Family Members" tab
@@ -117,6 +148,8 @@ finance/
 
 - All data is stored in `database.json` file
 - Data persists across browser refreshes and server restarts
+- Each user's data is isolated and secure
+- User passwords are hashed using bcrypt for security
 - Automatic backup on every change
 
 ## 🎨 Design Features
@@ -132,7 +165,8 @@ finance/
 - **Backend**: Node.js, Express.js
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
 - **Database**: JSON file storage
-- **Authentication**: Express sessions
+- **Authentication**: Express sessions with bcrypt password hashing
+- **Security**: Password hashing, session management, data isolation
 
 ## 📊 Month/Year Filtering
 
@@ -170,16 +204,28 @@ Every entry (family member, EMI, expense) has:
 - Make sure Node.js is installed: `node --version`
 - Install dependencies: `npm install`
 
+**Can't register:**
+- Make sure username is at least 3 characters
+- Make sure password is at least 6 characters
+- Check that passwords match
+- Username might already be taken - try a different one
+
 **Can't login:**
-- Verify you're using correct credentials (BELLAM / BELLAM@123)
-- Clear browser cookies and try again
+- Verify you're using the correct credentials
+- Username and password are case-sensitive
+- If you forgot your password, contact the administrator
+
+**Registration not working:**
+- Clear browser cookies and cache
+- Make sure the server is running
+- Check console for error messages
 
 **Data not saving:**
 - Check if `database.json` file has write permissions
 - Ensure the server is running
 
 **Port already in use:**
-- Another application might be using port 3000
+- Another application might be using port 8080
 - Stop other applications or change the PORT in server.js
 
 ## 📄 License
